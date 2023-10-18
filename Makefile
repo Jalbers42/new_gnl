@@ -1,18 +1,22 @@
 CC := gcc
 
-# Extra flags to give to the C compiler
 CFLAGS := -Wall -Wextra -Werror
 
 RM := /bin/rm -f
 
 MAIN := gnl 
 
-SRC := get_next_line.c
+SRC := get_next_line.c get_next_line_utils.c
+
+OBJ := $(SRC:.c=.o)
 
 all: $(MAIN)
 
-$(MAIN):
-	$(CC) $(CFLAGS) $(SRC) -o $(MAIN)
+$(MAIN): $(OBJ)
+	$(CC) $(CFLAGS) $^ -o $@
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
 

@@ -19,8 +19,11 @@
 # include <fcntl.h>
 
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 1
+#  define BUFFER_SIZE 20
 # endif
 
+int     ft_str_len(char *str);
+int     contains_newline(char *str);
+char    *ft_str_join(char *str1, char *str2);
 
 #endif

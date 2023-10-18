@@ -12,70 +12,78 @@
 
 #include "get_next_line.h"
 
-int ft_str_len(char *str)
+char *extract_next_line(char *str)
 {
-    int i;
-    
-    if (!str) 
-        return (0);
-    while (str[i])
+    char    *next_line;
+    int     i;
+
+    if (!str || str[0] == '\0')
+        return (NULL);
+    i = 0;
+    while (str && str[i] && str[i] != '\n')
         i++;
-    return (i);
+    next_line = malloc((i + 1) * sizeof(char));
+    i = 0;
+    while (str && str[i] && str[i] != '\n')
+    {
+        next_line[i] = str[i];
+        i++;
+    }
+    next_line[i] = '\0';
+    return (next_line);
 }
 
-char *ft_str_join(char *str1, char *str2)
+char *get_remainder(char *str)
 {
-    char    *new_str;
-    int     i;
-    int     j;
-
-    new_str = malloc((ft_str_len(str1) + ft_str_len(str2) + 1) * sizeof(char));
+    int i;
+    int j;
+    
     i = 0;
-    while (str1 && str1[i])
-    {
-        new_str[i] = str1[i];
-        i++; 
-    }
+    while (str && str[i] && str[i] != '\n')
+        i++;
+    if (str && str[i] == '\n')
+        i++;
     j = 0;
-    while (str2[j])
-        new_str[i++] = str2[j++];
-    new_str[i] = '\0';
-    if (str1)
-        free(str1);
-    return (new_str);
+    while (str && str[i])
+        str[j++] = str[i++];
+    str[j] = '\0';
+    return (str); 
 }
 
 char *get_next_line(int fd)
 {
     char        *buffer;
-    static char *final_str;
+    static char *read_str;
+    char        *next_line;
     int         bytes_read;
     
-    final_str = NULL;
     buffer = malloc((BUFFER_SIZE + 1) * sizeof(char));
     bytes_read = 1;
-    while (bytes_read > 0)
+    while (bytes_read > 0 && !contains_newline(read_str))
     {
         bytes_read = read(fd, buffer, BUFFER_SIZE);
         buffer[bytes_read] = '\0';
-        final_str = ft_str_join(final_str, buffer); 
+        read_str = ft_str_join(read_str, buffer); 
     }
     free(buffer); 
-    return (final_str);
+    next_line = extract_next_line(read_str);
+    read_str = get_remainder(read_str);
+    return (next_line);
 }
 
 int	main(void)
 {
-    int fd;
-    // int i;
+    int     fd;
+    char    *str;
     
     fd = open("test.txt", O_RDONLY);
-    // get_next_line(fd);
-        printf("%s\n", get_next_line(fd));
-    // i = 0;
-    // while (i < 1)
-    // {
-    //     i++;
-    // }
+    while (1)
+    {
+        str = get_next_line(fd);
+        if (str == NULL)
+            break;
+        printf("%s\n", str);
+        free (str);
+    }
     return (0);
 }
